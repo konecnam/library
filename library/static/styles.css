@@ -1,0 +1,9 @@
+.form-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-left: 12px;
+}
+
+.left-margin{
+    margin-left: 12px;
+}

@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="left-margin">
+
+    <h2>Register</h2>
+
+    {% if message %}
+    <div id="message">{{ message }}</div>
+    {% endif %}
+
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <div class="form-container">
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input" type="text" name="username" placeholder="Username">
+                <label class="mdl-textfield__label" for="sample1">Username...</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input" type="email" name="email" placeholder="Email Address">
+                <label class="mdl-textfield__label" for="sample1">Email Address...</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input" type="password" name="password" placeholder="Password">
+                <label class="mdl-textfield__label" for="sample1">Password...</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input" type="password" name="confirmation" placeholder="Confirm Password">
+                <label class="mdl-textfield__label" for="sample1">Confirm Password...</label>
+            </div>
+        </div>
+        <br>
+        <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="submit"
+            value="Register">
+
+    </form>
+    <br>
+    Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+</div>
+
+
+{% endblock %}
