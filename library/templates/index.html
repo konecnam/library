@@ -1,6 +1,32 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<br>
+<h4 class="title_bestsellers">Best sellers</h4>
+<br>
+
+<div class="container">
+    {% for book in books %}
+    <div class="demo-card-square mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__media" style="background: url('{{book.book_image}}') center / cover; height: 600px;">
+            <span class="mdl-chip">
+                <span class="mdl-chip__text">{{book.category}}</span>
+            </span>
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                More information
+            </a>
+        </div>
+        <div class="mdl-card__supporting-text">
+            {{book.title}}, {{book.author}}
+            <br>
+            {{book.description}}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
 
 
 {% endblock %}
