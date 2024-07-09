@@ -4,6 +4,52 @@
     margin-left: 12px;
 }
 
-.left-margin{
+.left-margin {
     margin-left: 12px;
 }
+
+.mdl-chip{
+    margin-top: 15px;
+    margin-left: 8px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Tři rovnoměrné sloupce */
+    gap: 20px;
+    /* Mezery mezi kartami */
+    max-width: 1000px;
+    /* Maximální šířka kontejneru */
+    margin: 0 auto;
+    /* Centrovat kontejner */
+}
+
+.demo-card-square.mdl-card {
+    width: 330px;
+}
+
+
+.title_bestsellers {
+    text-align: center;
+    /* Horizontální centrování textu */
+    margin: 0;
+    /* Odstraní výchozí okraje */
+    padding: 0;
+}
+
+.mdl-card__media {
+    position: relative;
+    width: 330px; /* Šířka obrázku */
+    height: 450px;
+}
+
+.mdl-card__media img {
+    width: 100%; /* Aby obrázek zabíral celý rodičovský element */
+    display: block; /* Zabrání mezerám okolo obrázku */
+}
+
+.mdl-card__actions {
+    height: 30px;
+}
+
