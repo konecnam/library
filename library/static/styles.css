@@ -8,6 +8,11 @@
     margin-left: 12px;
 }
 
+.mdl-chip{
+    margin-top: 15px;
+    margin-left: 8px;
+}
+
 .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -21,7 +26,7 @@
 }
 
 .demo-card-square.mdl-card {
-    width: 320px;
+    width: 330px;
 }
 
 
@@ -35,8 +40,8 @@
 
 .mdl-card__media {
     position: relative;
-    width: 320px; /* Šířka obrázku */
-    height: 600px;
+    width: 330px; /* Šířka obrázku */
+    height: 450px;
 }
 
 .mdl-card__media img {
