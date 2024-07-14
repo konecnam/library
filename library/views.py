@@ -19,6 +19,17 @@ class Book_card:
         self.description = description
         self.title = title
 
+class Book_card_info:
+    def __init__(self, author, book_image, description, title, publisher, primary_isbn10, primary_isbn13, buy_links):
+        self.author = author
+        self.book_image = book_image
+        self.description = description
+        self.title = title
+        self.publisher= publisher
+        self.primary_isbn10 = primary_isbn10
+        self.primary_isbn13 = primary_isbn13
+        self.buy_links = buy_links
+        
 
 def best_book():
     cards = []
@@ -37,6 +48,32 @@ def best_book():
         card = Book_card(category, author, book_image, description, title) 
         cards.append(card)
     return cards
+
+def more_about_book(category):
+    slovnik_link = {}
+    response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
+    data = response.json()
+    results = data ['results']
+    books = results['books']
+    book_1 = books[0]
+    author = book_1['author']
+    book_image = book_1['book_image']
+    description = book_1['description']
+    title = book_1['title']
+    publisher = book_1['publisher']
+    primary_isbn10=book_1['primary_isbn10']
+    primary_isbn13 = book_1['primary_isbn13']
+    buy_links = book_1['buy_links']
+    card = Book_card_info(author, book_image, description, title, publisher, primary_isbn10,primary_isbn13, buy_links)
+    return card
+
+
+def more_info_a_book(request,category):
+    if request.method == "GET":
+        return render(request, "more_info_a_book.html", {
+            'book':more_about_book(category)
+        })
+
 
 
 def index(request):
