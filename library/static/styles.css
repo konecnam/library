@@ -8,10 +8,11 @@
     margin-left: 12px;
 }
 
-.mdl-chip{
+.mdl-chip {
     margin-top: 15px;
     margin-left: 8px;
 }
+
 
 .container {
     display: grid;
@@ -40,16 +41,81 @@
 
 .mdl-card__media {
     position: relative;
-    width: 330px; /* Šířka obrázku */
+    width: 330px;
+    /* Šířka obrázku */
     height: 450px;
 }
 
 .mdl-card__media img {
-    width: 100%; /* Aby obrázek zabíral celý rodičovský element */
-    display: block; /* Zabrání mezerám okolo obrázku */
+    width: 100%;
+    /* Aby obrázek zabíral celý rodičovský element */
+    display: block;
+    /* Zabrání mezerám okolo obrázku */
 }
 
 .mdl-card__actions {
     height: 30px;
 }
 
+.text-container {
+    max-width: 900px; /* Nastavte maximální šířku textového kontejneru podle potřeby */
+    
+}
+
+.title_book{
+    margin-top: 60px;
+}
+
+.mdl-list__item{
+    padding: 0px;
+    min-height: 20px;
+}
+
+.book_image {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 15px; /* Zmenšit mezery mezi kartami */
+    max-width: 1000px;
+    margin: 0 auto;
+    align-items: start; /* Zarovnat vrchol všech prvků */
+}
+
+.grid-container_book {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.mdl-layout-title a{
+    color: white;
+    text-decoration: none;
+}
+
+.top_5_books {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    /* Tři rovnoměrné sloupce */
+    gap: 20px;
+    /* Mezery mezi kartami */
+    max-width: 1000px;
+    /* Maximální šířka kontejneru */
+    margin: 0 auto;
+    /* Centrovat kontejner */
+    margin-top: 15px;
+}
+
+.top_5_books .mdl-card__media {
+    position: relative;
+    width: 200px;
+    height: 250px;
+}
+
+.top_5_books .mdl-card {
+    width: 200px;
+}
+
+.tops-of-books{
+    margin-left: 138px;
+    font-size: 20px;
+    margin-top: 30px;
+}

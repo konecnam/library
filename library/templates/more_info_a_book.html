@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="book_image">
+    <div class="demo-card-square mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__media" style="background: url('{{book.book_image}}'); background-position: center; background-repeat: no-repeat; background-size: 280px 400px;">
+        </div>
+    </div>
+    <div class="text-container" >
+        <h3 class="title_book">{{book.title}}</h3>
+        <h4>Author: {{book.author}} </h4>
+        <p>{{book.description}} </p>
+        <p>Publisher: {{book.publisher}}</p>
+        <p>
+        {% if book.primary_isbn10 != 'None' %}
+            ISBN 10: {{book.primary_isbn10}}
+        {% endif %}
+        <br>
+        {% if book.primary_isbn13 != 'None' %}
+            ISBN 13: {{book.primary_isbn13}}
+        {% endif %}
+        </p>
+        <ul class="demo-list-icon mdl-list grid-container_book">
+            {% for link in book.buy_links %}
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons mdl-list__item-icon">link</i>
+                <a class="mdl-navigation__link" href="{{link.url}}">{{link.name}}</a>
+          </span>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="tops-of-books">Top books in {{book.category}}:</div>
+<div class="top_5_books">
+    {% for top5 in tops5 %}
+    <div class="demo-card-square mdl-card mdl-shadow--2dp">
+        <a href="{% url 'more_info_a_book' book.category forloop.counter %}">
+        <div class="mdl-card__media" style="background: url('{{top5.book_image}}'); background-position: center; background-repeat: no-repeat; background-size: 180px 230px;">
+            <span class="mdl-chip" style="margin-top: 3px; background-color: rgb(255,64,129);color: rgb(255,255,255);">
+                <span class="mdl-chip__text">{{ forloop.counter }}</span>
+            </span>
+        </div>
+        </a>
+        <div class="mdl-card__supporting-text">
+            {{top5.title}}, {{top5.author}}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+    
+
+{% endblock %}
