@@ -89,3 +89,32 @@
     color: white;
     text-decoration: none;
 }
+
+.top_5_books {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    /* Tři rovnoměrné sloupce */
+    gap: 20px;
+    /* Mezery mezi kartami */
+    max-width: 1000px;
+    /* Maximální šířka kontejneru */
+    margin: 0 auto;
+    /* Centrovat kontejner */
+    margin-top: 15px;
+}
+
+.top_5_books .mdl-card__media {
+    position: relative;
+    width: 200px;
+    height: 250px;
+}
+
+.top_5_books .mdl-card {
+    width: 200px;
+}
+
+.tops-of-books{
+    margin-left: 138px;
+    font-size: 20px;
+    margin-top: 30px;
+}

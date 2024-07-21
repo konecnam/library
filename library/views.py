@@ -20,7 +20,7 @@ class Book_card:
         self.title = title
 
 class Book_card_info:
-    def __init__(self, author, book_image, description, title, publisher, primary_isbn10, primary_isbn13, buy_links):
+    def __init__(self, author, book_image, description, title, publisher, primary_isbn10, primary_isbn13, buy_links, category):
         self.author = author
         self.book_image = book_image
         self.description = description
@@ -29,6 +29,13 @@ class Book_card_info:
         self.primary_isbn10 = primary_isbn10
         self.primary_isbn13 = primary_isbn13
         self.buy_links = buy_links
+        self.category = category
+
+class Book_top5:
+    def __init__(self, author, book_image, title):
+        self.author = author
+        self.book_image = book_image
+        self.title = title
         
 
 def best_book():
@@ -50,10 +57,10 @@ def best_book():
     return cards
 
 def more_about_book(category):
-    slovnik_link = {}
     response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
     data = response.json()
     results = data ['results']
+    category= results['list_name']
     books = results['books']
     book_1 = books[0]
     author = book_1['author']
@@ -64,14 +71,23 @@ def more_about_book(category):
     primary_isbn10=book_1['primary_isbn10']
     primary_isbn13 = book_1['primary_isbn13']
     buy_links = book_1['buy_links']
-    card = Book_card_info(author, book_image, description, title, publisher, primary_isbn10,primary_isbn13, buy_links)
-    return card
+    card = Book_card_info(author, book_image, description, title, publisher, primary_isbn10,primary_isbn13, buy_links, category)
+    tops5=[]
+    for book in books[:5]:
+        author = book['author']
+        book_image = book['book_image']
+        title = book['title']   
+        top5=Book_top5(author, book_image, title)
+        tops5.append(top5)
+    return card, tops5
 
 
 def more_info_a_book(request,category):
     if request.method == "GET":
+        book, tops5 = more_about_book(category)
         return render(request, "more_info_a_book.html", {
-            'book':more_about_book(category)
+            'book':book,
+            'tops5': tops5
         })
 
 
