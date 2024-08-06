@@ -34,9 +34,18 @@
 .title_bestsellers {
     text-align: center;
     /* Horizontální centrování textu */
-    margin: 0;
+    margin: 12px;
     /* Odstraní výchozí okraje */
     padding: 0;
+}
+
+.title_no_data {
+    text-align: center;
+    /* Horizontální centrování textu */
+    margin: 12px;
+    /* Odstraní výchozí okraje */
+    padding: 65px;
+    
 }
 
 .mdl-card__media {
@@ -119,3 +128,66 @@
     font-size: 20px;
     margin-top: 30px;
 }
+
+.upload_book{
+    margin-left: 75px;
+    font-size: 20px;
+    margin-top: 20px;
+    
+}
+
+.spinner {
+    border: 16px solid rgb(96,125,139); 
+    border-top: 16px solid rgb(255,64,129);
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+.spinner_II{
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    margin: 60px;
+}
+
+.mdl-data-table {
+    /* border: 16px solid rgb(96,125,139);  */
+    /* border-top: 16px solid rgb(255,64,129); */
+    /* margin-right: 185px; */
+    /* Horizontální centrování textu */
+    padding: 0;
+    margin-top: 18px;
+}
+
+.title_upload {
+    /* margin-left: 130px; */
+    /* Horizontální centrování textu */
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+.center_div{
+    display: flex; 
+    justify-content: center;
+}
+/* .title_your_upload {
+    margin-right: 420px;
+    padding: 0;
+}
+
+/* .next_side{
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;  
+} */

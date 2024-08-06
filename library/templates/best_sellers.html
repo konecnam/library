@@ -1,0 +1,22 @@
+<div class="container">
+    {% for book in books %}
+    <div class="demo-card-square mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__media" style="background: url('{{book.book_image}}'); background-position: center; background-repeat: no-repeat; background-size: 280px 400px;">
+            <span class="mdl-chip">
+                <span class="mdl-chip__text">{{book.category}}</span>
+            </span>
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{% url 'more_info_a_book' book.category '1' %}">
+                More information
+            </a>
+        </div>
+        <div class="mdl-card__supporting-text">
+            {{book.title}}, {{book.author}}
+            <br>
+            {{book.description}}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
