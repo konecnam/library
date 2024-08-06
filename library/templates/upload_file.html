@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h4 class="title_upload">Upload book</h4>
+
+<div class="center_div">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored upload_book">
+      <i class="material-icons">upload_file</i>
+      <input type="file" id="file" name="file" style="display: none;">
+    </label>
+    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent  upload_book"
+      type="submit" value="Upload">
+  </form>
+</div>
+<br>
+
+<h4 class="title_upload">Your books</h4>
+<div class="center_div">
+  <table class="mdl-data-table mdl-js-data-table">
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric">File name</th>
+        <th>Author</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in uploaded_books %}
+      <tr>
+        <td class="mdl-data-table__cell--non-numeric">{{ book.file_name }}</td>
+        <td>{{ book.author.username }}</td>
+        <td>{{ book.date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p>{{file_name}}</p>
+
+{% endblock %}
