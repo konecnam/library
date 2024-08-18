@@ -2,8 +2,13 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from .models import User, UploadedBook
+from spire.pdf import *
+from spire.pdf.common import *
 import requests
 import json
+from io import BytesIO
+
+
 
 # Create your views here.
 
@@ -146,17 +151,7 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "register.html")
-    
-def upload_file(request):
-    if request.method == 'POST' and request.FILES['file']:
-        uploaded_file = request.FILES['file']
-        # uploaded_file.name = nazev PDF, ktere si vyberu takto: uploaded_file.name
-        upload_file = UploadedBook (file_name=uploaded_file.name, author=request.user, file=uploaded_file)
-        upload_file.save()
-        return render(request, 'upload_file.html', {'file_name': uploaded_file.name})
-    uploaded_books = UploadedBook.objects.filter(author=request.user).order_by('-date')
-    return render(request, 'upload_file.html', {'uploaded_books': uploaded_books})
-    
+
 def best_sellers(request):
     cards = best_book()
     if len(cards) > 0:
@@ -165,4 +160,31 @@ def best_sellers(request):
         })
     else:
         return render(request, "no_data.html")
+
+def upload_file(request):
+    if request.method == 'POST' and request.FILES['file']:
+        uploaded_file = request.FILES['file']
+        if uploaded_file.content_type != 'application/pdf':
+            uploaded_books = UploadedBook.objects.filter(author=request.user).order_by('-date')
+            return render(request, 'upload_file.html', {'error': 'Only PDF files are allowed, try again!', 'uploaded_books': uploaded_books})
+        # uploaded_file.name = nazev PDF, ktere si vyberu takto: uploaded_file.name
+        upload_file = UploadedBook (file_name=uploaded_file.name, author=request.user, file=uploaded_file)
+        upload_file.save()
+        title, author_of_book = get_pdf_info(upload_file.file.path)
+        upload_file.title=title
+        upload_file.author_of_book=author_of_book
+        upload_file.save()
+        return HttpResponseRedirect(reverse("upload_file"))
+    uploaded_books = UploadedBook.objects.filter(author=request.user).order_by('-date')
+    return render(request, 'upload_file.html', {'uploaded_books': uploaded_books})
+
+def get_pdf_info(path):
+    doc = PdfDocument()
+    doc.LoadFromFile(path)
+    information = doc.DocumentInformation
+    title = information.Title
+    author_of_book = information.Author
+    return title, author_of_book
+    
+
     

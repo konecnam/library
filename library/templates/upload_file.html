@@ -15,7 +15,9 @@
       type="submit" value="Upload">
   </form>
 </div>
-<br>
+{% if error %}
+    <h4 class="title_upload" style="color: rgb(226, 12, 12);">{{error}}</h4>
+ {% endif %}
 
 <h4 class="title_upload">Your books</h4>
 <div class="center_div">
@@ -23,6 +25,8 @@
     <thead>
       <tr>
         <th class="mdl-data-table__cell--non-numeric">File name</th>
+        <th>Title</th>
+        <th>Author of book</th>
         <th>Author</th>
         <th>Time</th>
       </tr>
@@ -31,6 +35,8 @@
       {% for book in uploaded_books %}
       <tr>
         <td class="mdl-data-table__cell--non-numeric">{{ book.file_name }}</td>
+        <td>{{book.title}}</td>
+        <td>{{book.author_of_book}}</td>
         <td>{{ book.author.username }}</td>
         <td>{{ book.date }}</td>
       </tr>

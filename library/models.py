@@ -11,4 +11,6 @@ class UploadedBook(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
     id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=1024, null=True)
+    author_of_book = models.CharField(max_length=1024, null=True)
     
