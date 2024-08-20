@@ -63,9 +63,8 @@ def best_book():
     return cards
 
 
-def more_about_book(category, number):
-    response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
-    data = response.json()
+def more_about_book(data, number):
+    # if 'results' in data:
     results = data ['results']
     category= results['list_name']
     books = results['books']
@@ -86,16 +85,26 @@ def more_about_book(category, number):
         title = book['title']   
         top5=Book_top5(author, book_image, title)
         tops5.append(top5)
-    return card, tops5, 
+    return card, tops5
+        
 
 
 def more_info_a_book(request,category, number):
     if request.method == "GET":
-        book, tops5 = more_about_book(category, number)
-        return render(request, "more_info_a_book.html", {
-            'book':book,
-            'tops5': tops5
-        })
+        response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
+        data = response.json()
+        if 'results' in data:
+            book, tops5 = more_about_book(data, number)
+            return render(request, "more_info_a_book.html", {
+                'book':book,
+                'tops5': tops5
+            })
+        else:
+            return render(request, "no_data_book.html", {
+                'category':category,
+                'number': number
+            })
+
 
 
 

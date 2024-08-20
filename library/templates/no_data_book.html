@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h3 class="title_no_data">Could not load list from New York Times!</h3>
+<h3 class="title_no_data", style="padding:  1px;">Click <a href="{% url 'more_info_a_book' category number %}">here</a> to try again.</h3>
+
+{% endblock %}
