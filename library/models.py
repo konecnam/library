@@ -13,4 +13,11 @@ class UploadedBook(models.Model):
     id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=1024, null=True)
     author_of_book = models.CharField(max_length=1024, null=True)
-    
+
+class MyBook(models.Model):
+    book_title = models.CharField(max_length=1024, null=False)
+    author = models.CharField(max_length=1024, null=False)
+    book_description = models.CharField(max_length=1024, null=False)
+    image = models.CharField(max_length=1024, null=True) 
+    date = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)

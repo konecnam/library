@@ -1,1 +1,1 @@
-select * from library_uploadedbook
+select * from library_mybook
