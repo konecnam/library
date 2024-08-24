@@ -47,6 +47,7 @@
                 <nav class="mdl-navigation">
                     {% if user.is_authenticated %}
                     <a class="mdl-navigation__link" href="{% url 'upload_file' %}">Upload</a>
+                    <a class="mdl-navigation__link" href="{% url 'collection' %}">Collection</a>
                     <a class="mdl-navigation__link" href="{% url 'logout' %}">Logout</a>
                     {% else %}
                     <a class="mdl-navigation__link" href="{% url 'login' %}">Login</a>

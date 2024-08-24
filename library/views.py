@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from .models import User, UploadedBook
+from .models import User, UploadedBook, MyBook
 from spire.pdf import *
 from spire.pdf.common import *
 import requests
@@ -195,5 +195,19 @@ def get_pdf_info(path):
     author_of_book = information.Author
     return title, author_of_book
     
+def collection(request):
+    if request.method == "GET":
+        return render(request, "collection.html")
+    else:
+        book_title = request.POST["book_title"]
+        author = request.POST["author"]
+        book_description = request.POST ["book_description"]
+        image = request.POST['image']
+        all_inf_my = MyBook (book_title=book_title, author=author, book_description=book_description, image=image, created_by=request.user)
+        all_inf_my.save()
+        return HttpResponseRedirect (reverse("collection"))
+
+
+
 
     

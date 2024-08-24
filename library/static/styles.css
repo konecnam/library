@@ -177,6 +177,12 @@
     text-align: center;
 }
 
+.mdl-textfield{
+    margin-left: 80px;
+    display: block;
+    margin-bottom: 5px; /* Volitelně přidá mezery mezi políčky */
+}
+
 .center_div{
     display: flex; 
     justify-content: center;
