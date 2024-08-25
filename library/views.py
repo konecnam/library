@@ -197,7 +197,8 @@ def get_pdf_info(path):
     
 def collection(request):
     if request.method == "GET":
-        return render(request, "collection.html")
+        books = MyBook.objects.filter(created_by=request.user)
+        return render(request, "collection.html", {"books": books})
     else:
         book_title = request.POST["book_title"]
         author = request.POST["author"]
