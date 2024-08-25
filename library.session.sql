@@ -1,1 +1,1 @@
-select * from library_mybook
+delete from library_mybook 
