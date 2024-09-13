@@ -228,6 +228,10 @@ def collection_edit(request, book_id):
         book = MyBook.objects.get(id=book_id)
         return render(request, "edit_collection.html", {"book_title": book.book_title, "author":book.author, "book_description": book.book_description, "book_id":book_id})
 
+def add_collection_form(request):
+    if request.method == "GET":
+        return render(request, "add_collection_form_book.html")
+
 def collection_edit_upload(request):
     if request.method == "POST":
         book_id = request.POST["edit_book_id"]

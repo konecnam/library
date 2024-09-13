@@ -1,0 +1,26 @@
+<form action="{% url 'collection' %}" method="post">
+    {% csrf_token %}
+    <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" name="book_title" placeholder="Book title">
+        <label class="mdl-textfield__label"></label>
+    </div>
+
+    <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" name="author" placeholder="Author">
+        <label class="mdl-textfield__label"></label>
+    </div>
+
+    <div class="mdl-textfield mdl-js-textfield">
+        <textarea class="mdl-textfield__input" type="text" rows="2" name="book_description"
+            placeholder="Book description"></textarea>
+        <label class="mdl-textfield__label">Book description</label>
+    </div>
+
+    <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" name="image" placeholder="Image">
+        <label class="mdl-textfield__label"></label>
+    </div>
+
+    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent  upload_book"
+        type="submit" value="Save">
+</form>
