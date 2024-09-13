@@ -36,7 +36,8 @@
     {% for book in books %}
     <div class="book_image_collection">
         <div class="demo-card-square mdl-card small mdl-shadow--2dp">
-            <div class="mdl-card__media small" style="background: url('{{book.image}}'); background-position: center; background-repeat: no-repeat; background-size: 140px 200px;">
+            <div class="mdl-card__media small"
+                style="background: url('{{book.image}}'); background-position: center; background-repeat: no-repeat; background-size: 140px 200px;">
                 <!-- {% if book.image %} -->
                 <!-- {% else %}
                     style="display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; color: #888; width: 100%; height: 100%;"
@@ -45,14 +46,26 @@
             </div>
         </div>
         <div class="text-container">
-            <h6 class="title_book">{{ book.book_title }}</h5>
-            <h6>{{ book.author }}</h5>
-            <p>Book description: {{ book.book_description }}</p>
+                <div hx-target="this" hx-swap="outerHTML">
+                    <h5>{{ book.book_title }}</h5>
+                    <h5>{{ book.author }}</h5>
+                    <p>Book description: {{ book.book_description }}</p>
+                    <button class="custom-button" hx-get="{% url 'collection_edit' book.id %}">
+                        Click To Edit
+                    </button>
+                </div>
+            <form method="POST" action="{% url 'delete' %}">
+            {% csrf_token %}
+                <input type="hidden" name="delete_book_id" value="{{book.id}}">
+                <button type="submit" style="border: none; background: none; cursor: pointer;">
+                <i class="material-icons" style="margin: 8px;">delete</i>
+                </button>
+            </form>
         </div>
     </div>
     {% endfor %}
     {% else %}
-        <p>No books saved yet.</p>
+    <p>No books saved yet.</p>
     {% endif %}
 </div>
 

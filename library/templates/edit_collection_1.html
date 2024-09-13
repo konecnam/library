@@ -1,0 +1,8 @@
+<div hx-target="this" hx-swap="outerHTML">
+    <h5>{{ book.book_title }}</h5>
+    <h5>{{ book.author }}</h5>
+    <p>Book description: {{ book.book_description }}</p>
+    <button class="custom-button" hx-get="{% url 'collection_edit' book.id %}">
+        Click To Edit
+    </button>
+</div>

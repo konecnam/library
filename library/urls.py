@@ -11,5 +11,8 @@ urlpatterns = [
     # path("more_info_a_book/<str:category>", views.more_info_a_book, name="more_info_a_book"),
     path("more_info_a_book/<str:category>/<str:number>", views.more_info_a_book, name="more_info_a_book"),
     path('upload/', views.upload_file, name='upload_file'),
-    path('collection', views.collection, name='collection')
+    path('collection', views.collection, name='collection'), 
+    path('delete', views.delete, name='delete'),
+    path('collection_edit/<str:book_id>', views.collection_edit, name='collection_edit'), 
+    path('collection_edit_upload', views.collection_edit_upload, name='collection_edit_upload')
 ]
