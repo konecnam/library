@@ -7,6 +7,7 @@ from spire.pdf.common import *
 import requests
 import json
 from io import BytesIO
+from django.contrib import messages
 
 
 
@@ -199,7 +200,7 @@ def collection(request):
     if request.method == "GET":
         books = MyBook.objects.filter(created_by=request.user)
         return render(request, "collection.html", {"books": books})
-    else:
+    else: 
         book_title = request.POST["book_title"]
         author = request.POST["author"]
         book_description = request.POST ["book_description"]
@@ -207,6 +208,53 @@ def collection(request):
         all_inf_my = MyBook (book_title=book_title, author=author, book_description=book_description, image=image, created_by=request.user)
         all_inf_my.save()
         return HttpResponseRedirect (reverse("collection"))
+    
+def delete(request):
+    if request.method == "POST":
+        delete_book_id = request.POST["delete_book_id"]
+        if not delete_book_id:
+            messages.error(request, "Book ID is missing.")
+            return  HttpResponseRedirect(reverse('collection'))
+        try:
+            book = MyBook.objects.get(id=delete_book_id, created_by=request.user)
+            book.delete()
+            messages.success(request, "Book deleted successfully!")
+        except MyBook.DoesNotExist:
+            messages.error(request, "Book not found or you do not have permission to delete this book.")
+        return HttpResponseRedirect(reverse('collection'))
+        
+def collection_edit(request, book_id):
+    if request.method == "GET":
+        book = MyBook.objects.get(id=book_id)
+        return render(request, "edit_collection.html", {"book_title": book.book_title, "author":book.author, "book_description": book.book_description, "book_id":book_id})
+
+def add_collection_form(request):
+    if request.method == "GET":
+        return render(request, "add_collection_form_book.html")
+
+def collection_edit_upload(request):
+    if request.method == "POST":
+        book_id = request.POST["edit_book_id"]
+        book_title = request.POST["book_title"]
+        author = request.POST["author"]
+        book_description = request.POST ["book_description"]
+        book = MyBook.objects.get(id=book_id)
+        book.book_title = book_title
+        book.author = author
+        book.book_description = book_description
+        book.save()
+        return render(request, "edit_collection_1.html", {
+                'book':book
+            })
+    book_id = request.GET["book_id"]
+    book = MyBook.objects.get(id=book_id)
+    return render(request, "edit_collection_1.html", {
+        'book': book  
+    })
+    
+
+
+
 
 
 

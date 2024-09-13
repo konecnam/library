@@ -218,3 +218,20 @@
     justify-content: space-between; 
     align-items: center;  
 } */
+
+.custom-button {
+    background-color: rgb(255,64,129);  /* Nastaví růžové pozadí */
+    color: white;            /* Nastaví bílý text */
+    border: none;            /* Odstraní okraj tlačítka */
+    padding: 7px 10px;      /* Nastaví vnitřní odsazení */
+    font-size: 14px;         /* Velikost textu */
+    border-radius: 5px;      /* Zaoblení rohů tlačítka */
+    cursor: pointer;         /* Nastaví ukazatel myši na "pointer" při hoveru */
+    text-transform: uppercase;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    border-radius: 2px;
+  }
+  
+.custom-button:hover {
+    background-color: #ff66b2; /* Tmavší růžová při hoveru */
+  }
