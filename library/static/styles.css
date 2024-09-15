@@ -235,3 +235,8 @@
 .custom-button:hover {
     background-color: #ff66b2; /* Tmavší růžová při hoveru */
   }
+
+.page-item-pink{
+   color:  rgb(255,64,129) !important;
+}
+ 

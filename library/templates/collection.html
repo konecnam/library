@@ -7,6 +7,20 @@
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent  upload_book" hx-get="{% url 'add_collection_form_book' %}">add book</button>
 </div>
 
+<form action="{% url 'collection' %}" method="get">
+    <div>
+        <h4 class="title_upload">Search</h4>
+        <div class="mdl-textfield mdl-js-textfield">
+            <input class="mdl-textfield__input" type="text" name="search" placeholder="Search">
+            <label class="mdl-textfield__label"></label>
+        </div>   
+    </div>
+    <button class="custom-button" style="margin-left: 75px;">
+        Search
+    </button>   
+</form>
+
+
 <h4 class="title_upload">Saved Books</h4>
 <div>
     {% if books %}
@@ -15,11 +29,6 @@
         <div class="demo-card-square mdl-card small mdl-shadow--2dp">
             <div class="mdl-card__media small"
                 style="background: url('{{book.image}}'); background-position: center; background-repeat: no-repeat; background-size: 140px 200px;">
-                <!-- {% if book.image %} -->
-                <!-- {% else %}
-                    style="display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; color: #888; width: 100%; height: 100%;"
-                    <p>Obrázek není k dispozici</p>
-                {% endif %} -->
             </div>
         </div>
         <div class="text-container">
@@ -42,8 +51,30 @@
     </div>
     {% endfor %}
     {% else %}
-    <p>No books saved yet.</p>
+    <h5 style="margin-left: 75px;">No books saved yet.</h5>
     {% endif %}
+    <nav aria-label="Page navigation example">
+        <ul class="pagination" style="margin-left: 75px;">
+            {% if books.has_previous %}
+                <li class="page-item">
+                <a class="page-link page-item-pink" href="{% url 'collection' %}?page={{posts.previous_page_number }}&search={{search_term}}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %} 
+          {% for page_number in pages %}
+          <li class="page-item"><a class="page-link page-item-pink" href="{% url 'collection' %}?page={{page_number }}&search={{search_term}}">{{page_number}}</a></li>
+          {% endfor %}
+            {% if books.has_next %}
+            <li class="page-item"></li>
+                <a class="page-link page-item-pink" href="{% url 'collection' %}?page={{ posts.next_page_number }}&search={{search_term}}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+            </a>
+          </li>
+        </ul>
+      </nav>
 </div>
 
 

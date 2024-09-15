@@ -8,6 +8,8 @@ import requests
 import json
 from io import BytesIO
 from django.contrib import messages
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 
 
@@ -16,6 +18,7 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 import os
+
 
 class Book_card:
     def __init__(self, category, author, book_image, description, title):
@@ -198,8 +201,16 @@ def get_pdf_info(path):
     
 def collection(request):
     if request.method == "GET":
-        books = MyBook.objects.filter(created_by=request.user)
-        return render(request, "collection.html", {"books": books})
+        search_term = request.GET.get("search", '').strip()
+        books = MyBook.objects.filter(
+            Q(created_by=request.user) & (Q(book_title__icontains=search_term) | Q(author__icontains=search_term))
+        ) 
+        paginator = Paginator(books, 8) 
+        page_number = request.GET.get("page", 1) 
+        page_obj = paginator.get_page(page_number)
+        list_stranek = [i for i in range(1, paginator.num_pages+1)]  
+        return render(request, "collection.html", {"books": page_obj, "pages":list_stranek, "search_term":search_term})
+                                                                        
     else: 
         book_title = request.POST["book_title"]
         author = request.POST["author"]
