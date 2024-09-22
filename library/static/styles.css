@@ -196,6 +196,7 @@
     height: 100%;
     width: 100%;
     text-align: center;
+    margin-top: 15px;
 }
 
 .mdl-textfield{
@@ -239,4 +240,11 @@
 .page-item-pink{
    color:  rgb(255,64,129) !important;
 }
- 
+
+.mdl-button-ikone{
+font-size: 24px;
+height: 40px;
+min-width: 40px;
+width: 40px;
+
+}
