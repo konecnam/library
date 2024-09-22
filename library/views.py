@@ -204,13 +204,12 @@ def collection(request):
         search_term = request.GET.get("search", '').strip()
         books = MyBook.objects.filter(
             Q(created_by=request.user) & (Q(book_title__icontains=search_term) | Q(author__icontains=search_term))
-        ) 
+        ).order_by('-date')
         paginator = Paginator(books, 8) 
         page_number = request.GET.get("page", 1) 
         page_obj = paginator.get_page(page_number)
         list_stranek = [i for i in range(1, paginator.num_pages+1)]  
-        return render(request, "collection.html", {"books": page_obj, "pages":list_stranek, "search_term":search_term})
-                                                                        
+        return render(request, "collection.html", {"books": page_obj, "pages":list_stranek, "search_term":search_term})                                                             
     else: 
         book_title = request.POST["book_title"]
         author = request.POST["author"]
