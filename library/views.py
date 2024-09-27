@@ -191,6 +191,20 @@ def upload_file(request):
     uploaded_books = UploadedBook.objects.filter(author=request.user).order_by('-date')
     return render(request, 'upload_file.html', {'uploaded_books': uploaded_books})
 
+def delete_upload_file(request):
+    if request.method == "POST":
+        delete_upload_file = request.POST["delete_upload_file"]
+        if not delete_upload_file:
+            messages.error(request, "Book ID is missing.")
+            return  HttpResponseRedirect(reverse('upload_file'))
+        try:
+            file = UploadedBook.objects.get(id=delete_upload_file, author=request.user)
+            file.delete()
+            messages.success(request, "Book deleted successfully!")
+        except UploadedBook.DoesNotExist:
+            messages.error(request, "Book not found or you do not have permission to delete this book.")
+        return HttpResponseRedirect(reverse('upload_file'))
+
 def get_pdf_info(path):
     doc = PdfDocument()
     doc.LoadFromFile(path)
