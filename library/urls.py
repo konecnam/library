@@ -16,4 +16,5 @@ urlpatterns = [
     path('collection_edit/<str:book_id>', views.collection_edit, name='collection_edit'), 
     path('collection_edit_upload', views.collection_edit_upload, name='collection_edit_upload'),
     path('add_collection_form_book', views.add_collection_form, name='add_collection_form_book'), 
+    path('delete_upload_file', views.delete_upload_file, name='delete_upload_file'),
 ]

@@ -29,6 +29,8 @@
         <th>Author of book</th>
         <th>Author</th>
         <th>Time</th>
+        <th>Add Book</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -39,6 +41,29 @@
         <td>{{book.author_of_book}}</td>
         <td>{{ book.author.username }}</td>
         <td>{{ book.date }}</td>
+        <td> <!-- Přidání tlačítka na každý řádek -->
+
+        <form action="{% url 'collection' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="book_title" value="{{ book.title|default_if_none:'Unknown'|default:'Unknown' }}">
+            <input type="hidden" name="author" value="{{ book.author_of_book|default_if_none:'Unknown'|default:'Unknown' }}">
+            <input type="hidden" name="book_description" value="{{book.description|default_if_none:'Imported from uploaded books'|default:'Imported from uploaded books'}}">
+            <input type="hidden" name="image" value="{{ book.book_image|default_if_none:'' }}">
+        <label class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-button-ikone">
+            <i class="material-icons">add_circle</i>
+            <input type="submit" value="add_book" style="display: none;">
+        </label>
+        </form>
+        </td>
+        <td>
+          <form method="POST" action="{% url 'delete_upload_file' %}">
+            {% csrf_token %}
+                <input type="hidden" name="delete_upload_file" value="{{book.id}}">
+          <button type="submit" style="border: none; background: none; cursor: pointer;">
+            <i class="material-icons" style="margin: 8px;">delete</i>
+          </button>
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
