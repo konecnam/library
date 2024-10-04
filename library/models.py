@@ -22,3 +22,4 @@ class MyBook(models.Model):
     date = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.IntegerField(primary_key=True)
+    category = models.CharField(max_length=1024, null=False)

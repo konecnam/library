@@ -45,12 +45,9 @@ class Book_top5:
         self.author = author
         self.book_image = book_image
         self.title = title
-        
 
-def best_book():
+def best_book(data):
     cards = []
-    response = requests.get(url= 'https://api.nytimes.com/svc/books/v3/lists/full-overview.json', params = {'api-key':os.getenv("API_KEY")})
-    data = response.json()
     if 'results' in data:
         results = data ['results']
         lists = results['lists']
@@ -82,6 +79,11 @@ def more_about_book(data, number):
     primary_isbn13 = book_1['primary_isbn13']
     buy_links = book_1['buy_links']
     card = Book_card_info(author, book_image, description, title, publisher, primary_isbn10,primary_isbn13, buy_links, category)
+    return card 
+
+def top_5 (data):
+    results = data ['results']
+    books = results['books']
     tops5=[]
     for book in books[:5]:
         author = book['author']
@@ -89,7 +91,7 @@ def more_about_book(data, number):
         title = book['title']   
         top5=Book_top5(author, book_image, title)
         tops5.append(top5)
-    return card, tops5
+    return tops5
         
 
 
@@ -98,7 +100,8 @@ def more_info_a_book(request,category, number):
         response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
         data = response.json()
         if 'results' in data:
-            book, tops5 = more_about_book(data, number)
+            book  = more_about_book(data, number)
+            tops5 = top_5(data)
             return render(request, "more_info_a_book.html", {
                 'book':book,
                 'tops5': tops5
@@ -166,7 +169,9 @@ def register(request):
         return render(request, "register.html")
 
 def best_sellers(request):
-    cards = best_book()
+    response = requests.get(url= 'https://api.nytimes.com/svc/books/v3/lists/full-overview.json', params = {'api-key':os.getenv("API_KEY")})
+    data = response.json()
+    cards = best_book(data)
     if len(cards) > 0:
         return render (request, "best_sellers.html", {
         "books":cards
@@ -229,7 +234,8 @@ def collection(request):
         author = request.POST["author"]
         book_description = request.POST ["book_description"]
         image = request.POST['image']
-        all_inf_my = MyBook (book_title=book_title, author=author, book_description=book_description, image=image, created_by=request.user)
+        category = request.POST['category']
+        all_inf_my = MyBook (book_title=book_title, author=author, book_description=book_description, image=image, category=category, created_by=request.user)
         all_inf_my.save()
         return HttpResponseRedirect (reverse("collection"))
     
@@ -250,7 +256,7 @@ def delete(request):
 def collection_edit(request, book_id):
     if request.method == "GET":
         book = MyBook.objects.get(id=book_id)
-        return render(request, "edit_collection.html", {"book_title": book.book_title, "author":book.author, "book_description": book.book_description, "book_id":book_id})
+        return render(request, "edit_collection.html", {"book_title": book.book_title, "author":book.author, "book_description": book.book_description, 'category':book.category, "book_id":book_id})
 
 def add_collection_form(request):
     if request.method == "GET":
@@ -262,10 +268,12 @@ def collection_edit_upload(request):
         book_title = request.POST["book_title"]
         author = request.POST["author"]
         book_description = request.POST ["book_description"]
+        category = request.POST ["category"]
         book = MyBook.objects.get(id=book_id)
         book.book_title = book_title
         book.author = author
         book.book_description = book_description
+        book.category =category
         book.save()
         return render(request, "edit_collection_1.html", {
                 'book':book
