@@ -23,3 +23,5 @@ class MyBook(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.IntegerField(primary_key=True)
     category = models.CharField(max_length=1024, null=False)
+    rating = models.IntegerField(null=True)
+    

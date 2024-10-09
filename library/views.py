@@ -10,6 +10,7 @@ from io import BytesIO
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.utils.http import urlencode
 
 
 
@@ -227,14 +228,19 @@ def collection(request):
         paginator = Paginator(books, 8) 
         page_number = request.GET.get("page", 1) 
         page_obj = paginator.get_page(page_number)
+        error = request.GET.get("error", " ") 
         list_stranek = [i for i in range(1, paginator.num_pages+1)]  
-        return render(request, "collection.html", {"books": page_obj, "pages":list_stranek, "search_term":search_term})                                                             
+        return render(request, "collection.html", {"books": page_obj, "pages":list_stranek, "search_term":search_term, "error":error})                                                             
     else: 
         book_title = request.POST["book_title"]
         author = request.POST["author"]
         book_description = request.POST ["book_description"]
         image = request.POST['image']
         category = request.POST['category']
+
+        if not book_title or not author or not book_description or not image or not category:
+            error_url = reverse("collection") + "?" + urlencode({"error": "Not all fields are filled in!"})
+            return HttpResponseRedirect(error_url)
         all_inf_my = MyBook (book_title=book_title, author=author, book_description=book_description, image=image, category=category, created_by=request.user)
         all_inf_my.save()
         return HttpResponseRedirect (reverse("collection"))
@@ -284,9 +290,21 @@ def collection_edit_upload(request):
         'book': book  
     })
     
+def stars(request):
+    if request.method == 'POST':
+        rating = request.POST.get('stars')
+        book_id = request.POST["book_id"]
+        if rating:
+            book = MyBook.objects.get(id=book_id)
+            book.rating = rating
+            book.save()
+            return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 
-
+           
+        
+    
 
 
 

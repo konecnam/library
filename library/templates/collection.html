@@ -4,7 +4,9 @@
 <h4 class="title_upload">Collection</h4>
 
 <div hx-target="this" hx-swap="outerHTML">
-    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent  upload_book" hx-get="{% url 'add_collection_form_book' %}">add book</button>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent  upload_book"
+        hx-get="{% url 'add_collection_form_book' %}">add book</button>
+    <h5 class="error">{{error}}</h5>
 </div>
 
 <form action="{% url 'collection' %}" method="get">
@@ -13,11 +15,11 @@
         <div class="mdl-textfield mdl-js-textfield">
             <input class="mdl-textfield__input" type="text" name="search" placeholder="Search">
             <label class="mdl-textfield__label"></label>
-        </div>   
+        </div>
     </div>
     <button class="custom-button" style="margin-left: 75px;">
         Search
-    </button>   
+    </button>
 </form>
 
 
@@ -32,21 +34,64 @@
             </div>
         </div>
         <div class="text-container">
-                <div hx-target="this" hx-swap="outerHTML">
-                    <h5>{{ book.book_title }}</h5>
-                    <h5>{{ book.author }}</h5>
-                    <p>Book description: {{ book.book_description }}</p>
-                    <p>Category: {{ book.category }}</p>
-                    <button class="custom-button" hx-get="{% url 'collection_edit' book.id %}">
-                        Click To Edit
-                    </button>
-                </div>
-            <form method="POST" action="{% url 'delete' %}">
-            {% csrf_token %}
-                <input type="hidden" name="delete_book_id" value="{{book.id}}">
-                <button type="submit" style="border: none; background: none; cursor: pointer;">
-                <i class="material-icons" style="margin: 8px;">delete</i>
+            <div hx-target="this" hx-swap="outerHTML">
+                <h5>{{ book.book_title }}</h5>
+                <h5>{{ book.author }}</h5>
+                <p>Book description: {{ book.book_description }}</p>
+                <p>Category: {{ book.category }}</p>
+                
+                <div class="button-icon-container">
+                <button class="custom-button" hx-get="{% url 'collection_edit' book.id %}">
+                    Click To Edit
                 </button>
+                
+                <form method="POST" action="{% url 'delete' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_book_id" value="{{book.id}}">
+                    <button type="submit" style="border: none; background: none; cursor: pointer;">
+                        <i class="material-icons" style="margin: 8px;">delete</i>
+                    </button>
+                </form>
+                </div>
+            </div>
+            <form class="rating" >
+                {% csrf_token %}
+                <label>
+                    <input hx-post="{% url 'stars' %}" hx-trigger= "click" type="radio" name="stars" value="1" hx-vals='{"book_id": "{{ book.id }}"}'
+                    {% if book.rating == 1 %} checked {% endif %} />
+                    <span class="icon">★</span>
+                </label>
+
+                <label>
+                    <input hx-post="{% url 'stars' %}" hx-trigger= "click" type="radio" name="stars" value="2" hx-vals='{"book_id": "{{ book.id }}"}'
+                    {% if book.rating == 2 %} checked {% endif %} />
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                </label>
+                <label>
+                    <input hx-post="{% url 'stars' %}" hx-trigger= "click" type="radio" name="stars" value="3" hx-vals='{"book_id": "{{ book.id }}"}'
+                    {% if book.rating == 3 %} checked {% endif %} />
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                </label>
+                <label>
+                    <input hx-post="{% url 'stars' %}" hx-trigger= "click" type="radio" name="stars" value="4" hx-vals='{"book_id": "{{ book.id }}"}'
+                    {% if book.rating == 4 %} checked {% endif %} />
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                </label>
+                <label>
+                    <input hx-post="{% url 'stars' %}" hx-trigger= "click" type="radio" name="stars" value="5" hx-vals='{"book_id": "{{ book.id }}"}'
+                    {% if book.rating == 5 %} checked {% endif %} />
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                    <span class="icon">★</span>
+                </label>
             </form>
         </div>
     </div>
@@ -57,25 +102,30 @@
     <nav aria-label="Page navigation example">
         <ul class="pagination" style="margin-left: 75px;">
             {% if books.has_previous %}
-                <li class="page-item">
-                <a class="page-link page-item-pink" href="{% url 'collection' %}?page={{posts.previous_page_number }}&search={{search_term}}" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
+            <li class="page-item">
+                <a class="page-link page-item-pink"
+                    href="{% url 'collection' %}?page={{posts.previous_page_number }}&search={{search_term}}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-            {% endif %} 
-          {% for page_number in pages %}
-          <li class="page-item"><a class="page-link page-item-pink" href="{% url 'collection' %}?page={{page_number }}&search={{search_term}}">{{page_number}}</a></li>
-          {% endfor %}
+            {% endif %}
+            {% for page_number in pages %}
+            <li class="page-item"><a class="page-link page-item-pink"
+                    href="{% url 'collection' %}?page={{page_number }}&search={{search_term}}">{{page_number}}</a></li>
+            {% endfor %}
             {% if books.has_next %}
             <li class="page-item"></li>
-                <a class="page-link page-item-pink" href="{% url 'collection' %}?page={{ posts.next_page_number }}&search={{search_term}}" aria-label="Next">
+            <a class="page-link page-item-pink"
+                href="{% url 'collection' %}?page={{ posts.next_page_number }}&search={{search_term}}"
+                aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
-            </li>
-            {% endif %}
+                </li>
+                {% endif %}
             </a>
-          </li>
+            </li>
         </ul>
-      </nav>
+    </nav>
 </div>
 
 
