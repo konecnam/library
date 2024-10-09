@@ -3,7 +3,18 @@
     <h5>{{ book.author }}</h5>
     <p>Book description: {{ book.book_description }}</p>
     <p>Category: {{ book.category }}</p>
-    <button class="custom-button" hx-get="{% url 'collection_edit' book.id %}">
-        Click To Edit
-    </button>
+    <div class="button-icon-container">
+        <button class="custom-button" hx-get="{% url 'collection_edit' book.id %}">
+            Click To Edit
+        </button>
+        <form method="POST" action="{% url 'delete' %}">
+            {% csrf_token %}
+            <input type="hidden" name="delete_book_id" value="{{book.id}}">
+            <button type="submit" style="border: none; background: none; cursor: pointer;">
+                <i class="material-icons" style="margin: 8px;">delete</i>
+            </button>
+        </form>
+        </div>
 </div>
+
+
