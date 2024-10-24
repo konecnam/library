@@ -8,7 +8,6 @@ urlpatterns = [
     path("login", views.login_view, name="login"),
     path("register", views.register, name="register"),
     path("logout", views.logout_view, name="logout"),
-    # path("more_info_a_book/<str:category>", views.more_info_a_book, name="more_info_a_book"),
     path("more_info_a_book/<str:category>/<str:number>", views.more_info_a_book, name="more_info_a_book"),
     path('upload/', views.upload_file, name='upload_file'),
     path('collection', views.collection, name='collection'), 
@@ -17,5 +16,5 @@ urlpatterns = [
     path('collection_edit_upload', views.collection_edit_upload, name='collection_edit_upload'),
     path('add_collection_form_book', views.add_collection_form, name='add_collection_form_book'), 
     path('delete_upload_file', views.delete_upload_file, name='delete_upload_file'),
-    path ('stars', views.stars, name='stars')
+    path ('stars', views.stars, name='stars'),
 ]
