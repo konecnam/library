@@ -5,12 +5,11 @@ from .models import User, UploadedBook, MyBook
 from spire.pdf import *
 from spire.pdf.common import *
 import requests
-import json
-from io import BytesIO
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils.http import urlencode
+
 
 
 
@@ -302,8 +301,7 @@ def stars(request):
     return HttpResponse(status=400)
 
 
-           
-        
+
     
 
 
