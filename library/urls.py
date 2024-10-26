@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, rest
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -17,4 +17,6 @@ urlpatterns = [
     path('add_collection_form_book', views.add_collection_form, name='add_collection_form_book'), 
     path('delete_upload_file', views.delete_upload_file, name='delete_upload_file'),
     path ('stars', views.stars, name='stars'),
+    path ('api/v1/library/collection', rest.all_books_from_collection, name='all_books_from_collection'),
+    path ('api/v1/library/collection/<str:book_id>', rest.all_books_from_collection_id, name='all_books_from_collection_id'), 
 ]
