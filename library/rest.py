@@ -3,6 +3,7 @@ from django.http import JsonResponse
 import json
 from .models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.forms.models import model_to_dict
 
 
 #   data = {
@@ -42,7 +43,7 @@ def all_books_from_collection(request):
         except User.DoesNotExist:
             return JsonResponse({"message": "User not found"}, safe=False, status=400)
 
-    
+@csrf_exempt   
 def all_books_from_collection_id(request, book_id):
     if request.method == "GET":
         try:
@@ -62,4 +63,22 @@ def all_books_from_collection_id(request, book_id):
             return response
         except MyBook.DoesNotExist:
             return JsonResponse({"message":"Book does not exist"}, safe=False, status=404)
-
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            if not "book_title" in data or not "author" in data or not "book_description" in data or not "image" in data or not "category" in data or not "rating" and "created_by" in data:
+                return JsonResponse({"message": "Missing required data"}, safe=False, status=400)
+            user = User.objects.get(username=data["created_by"])
+            book = MyBook.objects.get(id=book_id)
+            book.book_title = data["book_title"]
+            book.author = data["author"]
+            book.book_description = data["book_description"]
+            book.rating = data["rating"]
+            book.image = data["image"]
+            book.category = data["category"]
+            book.created_by = user
+            book.save()
+            book_dict = model_to_dict(book)
+            return JsonResponse(book_dict, safe=False)
+        except MyBook.DoesNotExist:
+            return JsonResponse({"message":"Book does not exist"}, safe=False, status=404)
