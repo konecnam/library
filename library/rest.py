@@ -82,3 +82,12 @@ def all_books_from_collection_id(request, book_id):
             return JsonResponse(book_dict, safe=False)
         except MyBook.DoesNotExist:
             return JsonResponse({"message":"Book does not exist"}, safe=False, status=404)
+    if request.method == "DELETE":
+        try:
+            book = MyBook.objects.get(id=book_id)
+            book.delete()
+            return JsonResponse({"message": "Book deleted successfully"}, status=200, safe=False)
+        except MyBook.DoesNotExist:
+            return JsonResponse({"message":"Book does not exist"}, safe=False, status=404)
+        
+    
