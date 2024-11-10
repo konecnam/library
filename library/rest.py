@@ -17,14 +17,21 @@ from django.forms.models import model_to_dict
 @csrf_exempt  
 def all_books_from_collection(request):
     if request.method == "GET":
-        books = MyBook.objects.all().values()
-        response = JsonResponse(list(books), safe=False)
+        books = MyBook.objects.all().order_by('-date').values('book_title','author', 'book_description', 'image', 'category', 'rating', 'created_by__username')
+        books_with_renamed_field = [
+            {
+                **book,
+                'created_by': book.pop('created_by__username')
+            }
+                for book in books
+            ]
+        response = JsonResponse(books_with_renamed_field, safe=False)
         return response    
     if request.method == "POST":
         try:
             data = json.loads(request.body)
             user = User.objects.get(username=data["created_by"])
-            book = MyBook (book_title = data["book_title"], author= data["author"], book_description=data["book_description"], image=data["image"], category=data["category"], created_by=user)
+            book = MyBook (book_title = data["book_title"], author= data["author"], book_description=data["book_description"], image=data["image"], category=data["category"], rating=data["rating"],created_by=user)
             book.save()
             book_data = {
                     "id": book.id,
