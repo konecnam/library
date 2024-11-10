@@ -1,12 +1,15 @@
 from django.test import TestCase
 from library.views import best_book, more_about_book, top_5
+from django.urls import reverse
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver
 from .models import User, UploadedBook, MyBook
 from selenium.webdriver.support.ui import Select
-import time
+import time, unittest
+from django.test import Client
+
 
 class Book_test(TestCase):
     def test_best_book_I(self):
@@ -466,7 +469,150 @@ class MyUserIn(StaticLiveServerTestCase):
         button_search.click()
         result = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[2]/h5')
         self.assertEqual('No books saved yet.', result.text)
-        
+
+class RestApiTest(unittest.TestCase):
+    
+    def setUp(self):
+        self.client = Client()
+
+    def tearDown(self):
+        # Vymažeme všechny záznamy z tabulek v databázi
+        MyBook.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_post(self):
+        User.objects.create(username='panenka')
+        response = self.client.post(reverse('all_books_from_collection'), data={
+            "book_title": "Happy",
+            "author": "DD",
+            "book_description": "Dětská kniha",
+            "rating": "2",
+            "created_by": "panenka",
+            "image": "https://rezised-images.knhbt.cz/880x880/31042988.webp",
+            "category": "other"
+        }, content_type="application/json")
+        book_info = response.json()
+        self.assertEqual(book_info["book_title"], "Happy")
+        self.assertEqual(book_info["author"], "DD")
+        self.assertEqual(book_info["book_description"], "Dětská kniha")
+        self.assertEqual(book_info["rating"], "2")
+        self.assertEqual(book_info["created_by"], "panenka")
+        self.assertEqual(book_info["image"], "https://rezised-images.knhbt.cz/880x880/31042988.webp")
+        self.assertEqual(book_info["category"], "other")
+        self.assertNotEqual(book_info["id"], None)
+        self.assertEqual(response.status_code, 200)
+        #kontrola zda je to v databazi
+        book = MyBook.objects.get(id=book_info["id"])
+        self.assertEqual(book.book_title, "Happy")
+        self.assertEqual(book.author, "DD")
+        self.assertEqual(book.book_description, "Dětská kniha")
+        self.assertEqual(book.rating, 2)
+        self.assertEqual(book.created_by.username, "panenka")
+        self.assertEqual(book.image, "https://rezised-images.knhbt.cz/880x880/31042988.webp")
+        self.assertEqual(book.category, "other")
+
+    def test_missing_data(self):
+        User.objects.create(username='panenka')
+        response = self.client.post(reverse('all_books_from_collection'), data={
+            "book_title": "Happy",
+            "book_description": "Dětská kniha",
+            "rating": "2",
+            "created_by": "panenka",
+            "image": "https://rezised-images.knhbt.cz/880x880/31042988.webp",
+            "category": "other"
+        }, content_type="application/json")
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Missing required data")
+        self.assertEqual(response.status_code, 400)
+
+    def test_user_not_found(self):
+        response = self.client.post(reverse('all_books_from_collection'), data={
+            "book_title": "Happy",
+            "author": "DD",
+            "book_description": "Dětská kniha",
+            "rating": "2",
+            "created_by": "slon",
+            "image": "https://rezised-images.knhbt.cz/880x880/31042988.webp",
+            "category": "other"
+        }, content_type="application/json")
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "User not found")
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_all_book(self):
+        user_1 = User.objects.create(username='panda')
+        first_book_1= MyBook (book_title='CCC', author='Mona Kasten', book_description='ZZZ', image='xxx', category='Romantic', created_by=user_1, rating= "2",)
+        first_book_1.save()
+
+        user_2 = User.objects.create(username='hroch')
+        second_book_0 = MyBook (book_title='auto', author='Julie Caplinova', book_description='BBB', image='AAA', category='Romantic', created_by=user_2, rating= "3",)
+        second_book_0.save()
+
+        response = self.client.get(reverse('all_books_from_collection'))
+        self.assertEqual(response.status_code, 200)
+        books = response.json()
+        self.assertIsInstance(books, list)
+
+        self.assertEqual (books[0]["book_title"], "auto")
+        self.assertEqual (books[0]["author"], "Julie Caplinova")
+        self.assertEqual (books[0]["book_description"], "BBB")
+        self.assertEqual (books[0]["image"], "AAA")
+        self.assertEqual (books[0]["category"], "Romantic")
+        self.assertEqual (books[0]["created_by"], "hroch")
+        self.assertEqual (books[0]["rating"], 3)
+
+        self.assertEqual (books[1]["book_title"], "CCC")
+        self.assertEqual (books[1]["author"], "Mona Kasten")
+        self.assertEqual (books[1]["book_description"], "ZZZ")
+        self.assertEqual (books[1]["image"], "xxx")
+        self.assertEqual (books[1]["category"], "Romantic")
+        self.assertEqual (books[1]["created_by"], "panda")
+        self.assertEqual (books[1]["rating"], 2)
+    
+    def test_get_all_book(self):
+        response = self.client.get(reverse('all_books_from_collection'))
+        self.assertEqual(response.status_code, 200)
+        books = response.json()
+        len_books = len(books)
+        self.assertEqual(len_books, 0)
+    
+    def test_get_book(self):
+        self.client = Client()
+        opice = User.objects.create(username='opice')
+        book= MyBook (book_title='Bad', author='XXX', book_description='ZZZ', image='xxx', category='Fantasy', created_by=opice, rating= "4",)
+        book.save()
+        response = self.client.get(reverse('all_books_from_collection_id', args=[book.id]))
+        book_info = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual (book_info["book_title"], "Bad")
+        self.assertEqual (book_info["author"], "XXX")
+        self.assertEqual (book_info["book_description"], "ZZZ")
+        self.assertEqual (book_info["image"], "xxx")
+        self.assertEqual (book_info["category"], "Fantasy")
+        self.assertEqual (book_info["created_by"], "opice")
+        self.assertEqual (book_info["rating"], 4)
+
+    def test_get_no_book(self):
+        book_id_notexist = 900
+        response = self.client.get(reverse('all_books_from_collection_id', args=[book_id_notexist]))
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Book does not exist")
+        self.assertEqual(response.status_code, 404)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
         
 
 
