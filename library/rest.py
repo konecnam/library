@@ -49,6 +49,7 @@ def all_books_from_collection(request):
             return JsonResponse({"message": "Missing required data"}, safe=False, status=400)
         except User.DoesNotExist:
             return JsonResponse({"message": "User not found"}, safe=False, status=400)
+    return JsonResponse ({"message":"Invalid request method"}, safe=False, status=405)
 
 @csrf_exempt   
 def all_books_from_collection_id(request, book_id):
@@ -75,8 +76,8 @@ def all_books_from_collection_id(request, book_id):
             data = json.loads(request.body)
             if not "book_title" in data or not "author" in data or not "book_description" in data or not "image" in data or not "category" in data or not "rating" and "created_by" in data:
                 return JsonResponse({"message": "Missing required data"}, safe=False, status=400)
-            user = User.objects.get(username=data["created_by"])
             book = MyBook.objects.get(id=book_id)
+            user = User.objects.get(username=data["created_by"])
             book.book_title = data["book_title"]
             book.author = data["author"]
             book.book_description = data["book_description"]
@@ -85,10 +86,26 @@ def all_books_from_collection_id(request, book_id):
             book.category = data["category"]
             book.created_by = user
             book.save()
-            book_dict = model_to_dict(book)
-            return JsonResponse(book_dict, safe=False)
+            book_data = {
+                    "id": book.id,
+                    "book_title": book.book_title,
+                    "author": book.author,  
+                    "book_description": book.book_description, 
+                    "rating": book.rating, 
+                    "created_by": book.created_by.username, 
+                    "image":book.image, 
+                    "category":book.category
+                }
+            response = JsonResponse(book_data, safe=False)
+            return response
         except MyBook.DoesNotExist:
             return JsonResponse({"message":"Book does not exist"}, safe=False, status=404)
+        except User.DoesNotExist:
+            return JsonResponse({"message":"User does not exist"}, safe=False, status=400)
+        except json.decoder.JSONDecodeError:
+            return JsonResponse({"message":"Invalid body"}, safe=False, status=400)
+        
+        
     if request.method == "DELETE":
         try:
             book = MyBook.objects.get(id=book_id)
@@ -96,5 +113,6 @@ def all_books_from_collection_id(request, book_id):
             return JsonResponse({"message": "Book deleted successfully"}, status=200, safe=False)
         except MyBook.DoesNotExist:
             return JsonResponse({"message":"Book does not exist"}, safe=False, status=404)
+    return JsonResponse ({"message":"Invalid request method"}, safe=False, status=405)
         
     

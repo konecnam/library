@@ -511,6 +511,21 @@ class RestApiTest(unittest.TestCase):
         self.assertEqual(book.image, "https://rezised-images.knhbt.cz/880x880/31042988.webp")
         self.assertEqual(book.category, "other")
 
+    def test_post_put(self):
+        User.objects.create(username='panenka')
+        response = self.client.put(reverse('all_books_from_collection'), data={
+            "book_title": "Happy",
+            "author": "DD",
+            "book_description": "Dětská kniha",
+            "rating": "2",
+            "created_by": "panenka",
+            "image": "https://rezised-images.knhbt.cz/880x880/31042988.webp",
+            "category": "other"
+        }, content_type="application/json")
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Invalid request method")
+        self.assertEqual(response.status_code, 405)
+
     def test_missing_data(self):
         User.objects.create(username='panenka')
         response = self.client.post(reverse('all_books_from_collection'), data={
@@ -599,7 +614,140 @@ class RestApiTest(unittest.TestCase):
         self.assertEqual(book_info["message"], "Book does not exist")
         self.assertEqual(response.status_code, 404)
 
+    def test_delete_200(self):
+        opice = User.objects.create(username='lenochod')
+        book= MyBook (book_title='Sad', author='GGG', book_description='PPP', image='xxx', category='Fantasy', created_by=opice, rating= "4",)
+        book.save()
+        response = self.client.delete(reverse('all_books_from_collection_id', args=[book.id]))
+        book_info = response.json()
+        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(MyBook.DoesNotExist):
+            MyBook.objects.get(id = book.id)
+        self.assertEqual(book_info["message"], "Book deleted successfully")
+    
+    def test_delete_404(self):
+        book_id_notexist = 999
+        response = self.client.delete(reverse('all_books_from_collection_id', args=[book_id_notexist]))
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Book does not exist")
+        self.assertEqual(response.status_code, 404)
 
+    def test_put(self):
+        medved = User.objects.create(username='medved')
+        book= MyBook (book_title='Lucky', author='LLL', book_description='UUU', image='CCC', category='Other', created_by=medved, rating= "5",)
+        book.save()
+        response = self.client.put(reverse('all_books_from_collection_id', args=[book.id]), 
+            data =  {
+            "book_title":"Funny", 
+            "author":"FFF", 
+            "book_description":"NNN",
+            "image":"UUU", 
+            "category":"Romantic", 
+            "created_by":"medved", 
+            "rating": "2"
+            } , content_type="application/json"
+        )
+        #kontrola response vrati slovnik 
+        book_info = response.json()
+        self.assertEqual(book_info["book_title"], "Funny")
+        self.assertEqual(book_info["author"], "FFF")
+        self.assertEqual(book_info["book_description"], "NNN")
+        self.assertEqual(book_info["rating"], "2")
+        self.assertEqual(book_info["created_by"], "medved")
+        self.assertEqual(book_info["image"], "UUU")
+        self.assertEqual(book_info["category"], "Romantic")
+        self.assertEqual(response.status_code, 200)
+        #kontrola zda je to v databazi
+        book = MyBook.objects.get(id=book_info["id"])
+        self.assertEqual(book.book_title, "Funny")
+        self.assertEqual(book.author, "FFF")
+        self.assertEqual(book.book_description, "NNN")
+        self.assertEqual(book.rating, 2)
+        self.assertEqual(book.created_by.username, "medved")
+        self.assertEqual(book.image, "UUU")
+        self.assertEqual(book.category, "Romantic")
+    
+    def test_put_404_no_book(self):
+        book_id_notexist = 1999
+        response = self.client.put(reverse('all_books_from_collection_id', args=[book_id_notexist]), 
+            data =  {
+            "book_title":"Funny", 
+            "author":"FFF", 
+            "book_description":"NNN",
+            "image":"UUU", 
+            "category":"Romantic", 
+            "created_by":"medved", 
+            "rating": "2"
+            } , content_type="application/json"
+        )
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Book does not exist")
+        self.assertEqual(response.status_code, 404)
+
+    def test_put_404_no_user(self):
+        medved = User.objects.create(username='medved')
+        book= MyBook (book_title='Lucky', author='LLL', book_description='UUU', image='CCC', category='Other', created_by=medved, rating= "5",)
+        book.save()
+        response = self.client.put(reverse('all_books_from_collection_id', args=[book.id]), 
+            data =  {
+            "book_title":"Funny", 
+            "author":"FFF", 
+            "book_description":"NNN",
+            "image":"UUU", 
+            "category":"Romantic", 
+            "created_by":"perina", 
+            "rating": "2"
+            } , content_type="application/json"
+        )
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "User does not exist")
+        self.assertEqual(response.status_code, 400)
+    
+    def test_put_404_no_data(self):
+        medved = User.objects.create(username='medved')
+        book= MyBook (book_title='Lucky', author='LLL', book_description='UUU', image='CCC', category='Other', created_by=medved, rating= "5",)
+        book.save()
+        response = self.client.put(reverse('all_books_from_collection_id', args=[book.id]), 
+            data =  { 
+            "author":"FFF", 
+            "book_description":"NNN",
+            "image":"UUU", 
+            "category":"Romantic", 
+            "created_by":"perina", 
+            "rating": "2"
+            } , content_type="application/json"
+        )
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Missing required data")
+        self.assertEqual(response.status_code, 400)
+    
+    def test_put_404_no_data_1(self):
+        medved = User.objects.create(username='medved')
+        book= MyBook (book_title='Lucky', author='LLL', book_description='UUU', image='CCC', category='Other', created_by=medved, rating= "5",)
+        book.save()
+        response = self.client.put(reverse('all_books_from_collection_id', args=[book.id]))
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Invalid body")
+        self.assertEqual(response.status_code, 400)
+        
+    def test_put_post(self):
+        medved = User.objects.create(username='medved')
+        book= MyBook (book_title='Lucky', author='LLL', book_description='UUU', image='CCC', category='Other', created_by=medved, rating= "5",)
+        book.save()
+        response = self.client.post(reverse('all_books_from_collection_id', args=[book.id]), 
+            data =  {
+            "book_title":"Funny", 
+            "author":"FFF", 
+            "book_description":"NNN",
+            "image":"UUU", 
+            "category":"Romantic", 
+            "created_by":"medved", 
+            "rating": "2"
+            } , content_type="application/json"
+        )
+        book_info = response.json()
+        self.assertEqual(book_info["message"], "Invalid request method")
+        self.assertEqual(response.status_code, 405)
 
 
 
