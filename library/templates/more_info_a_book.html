@@ -31,6 +31,7 @@
         </li>
         {% endfor %}
         </ul>
+        {% if user.is_authenticated %}
         <form action="{% url 'collection' %}" method="post">
             {% csrf_token %}
         <input type="hidden" name="book_title" value="{{book.title}}">
@@ -42,13 +43,14 @@
             <input type="submit" value="add_book" style="display: none;">
         </label>
         </form>
+        {% endif %}
     </div>
 </div>
 <div class="tops-of-books">Top books in {{book.category}}:</div>
 <div class="top_5_books">
     {% for top5 in tops5 %}
     <div class="demo-card-square mdl-card mdl-shadow--2dp">
-        <a href="{% url 'more_info_a_book' book.category forloop.counter %}">
+        <a href="{% url 'more_info_a_book' book.category_encoded forloop.counter %}">
         <div class="mdl-card__media" style="background: url('{{top5.book_image}}'); background-position: center; background-repeat: no-repeat; background-size: 180px 230px;">
             <span class="mdl-chip" style="margin-top: 3px; background-color: rgb(255,64,129);color: rgb(255,255,255);">
                 <span class="mdl-chip__text">{{ forloop.counter }}</span>
