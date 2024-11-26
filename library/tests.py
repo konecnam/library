@@ -9,6 +9,9 @@ from .models import User, UploadedBook, MyBook
 from selenium.webdriver.support.ui import Select
 import time, unittest
 from django.test import Client
+import responses
+from .full_overview import FULL_OVERVIEW
+from .category import COMBINED_PRINT_AND_EBOOK_FICTION
 
 
 class Book_test(TestCase):
@@ -469,6 +472,195 @@ class MyUserIn(StaticLiveServerTestCase):
         button_search.click()
         result = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[2]/h5')
         self.assertEqual('No books saved yet.', result.text)
+
+class MyBestSellers(StaticLiveServerTestCase):
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium = WebDriver()
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super().tearDownClass()
+
+    @responses.activate
+    def test_best_seller(self):
+        rsp1 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/full-overview.json", 
+        json=FULL_OVERVIEW,
+        status=200)
+        responses.add(rsp1)
+        self.selenium.get(self.live_server_url)
+        title = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/h4')
+        self.assertEqual("Best sellers", title.text)
+
+        category_first = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[1]/span/span')
+        self.assertEqual(category_first.text, "Combined Print and E-Book Fiction")
+        more_info = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[2]/a')
+        self.assertEqual(more_info.text, "MORE INFORMATION")
+        book_description_first = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[3]')
+        self.assertEqual(book_description_first.text, "HEXED, Emily McIntire\nThe sixth book in the Never After series. A forbidden love develops between the underboss to a mafia syndicate and his fiancée's cousin.")
+        category_last = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[18]/div[1]/span/span')
+        self.assertEqual(category_last.text, "Young Adult Paperback Monthly")
+        book_description_last=self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[18]/div[3]')
+        self.assertEqual (book_description_last.text, "IF HE HAD BEEN WITH ME, Laura Nowlin")
+
+    @responses.activate
+    def test_more(self):
+        rsp1 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/full-overview.json", 
+        json=FULL_OVERVIEW,
+        status=200)
+        responses.add(rsp1)
+
+        rsp2 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/current/combined-print-and-e-book-fiction.json", 
+        json= COMBINED_PRINT_AND_EBOOK_FICTION,
+        status=200)
+        responses.add(rsp2)
+        self.selenium.get(self.live_server_url)
+
+        more_info = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[2]/a')
+        more_info.click()
+        title = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/h3')
+        self.assertEqual(title.text, "TO DIE FOR")
+        author = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/h4')
+        self.assertEqual(author.text, "Author: David Baldacci")
+        book_description = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/p[1]')
+        self.assertEqual(book_description.text, "The third book in the 6:20 Man series. Devine digs into the deaths of an orphan’s parents and uncovers a large conspiracy.")
+        publish = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/p[2]')
+        self.assertEqual(publish.text, "Publisher: Grand Central")
+        ISBN = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/p[3]')
+        self.assertEqual(ISBN.text, "ISBN 10: 1538757931\nISBN 13: 9781538757932")
+        book_5 = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[3]/div[5]/a/div')
+        book_5.click()
+        author_5 = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/h3')
+        self.assertEqual(author_5.text, "A COURT OF THORNS AND ROSES")
+
+    @responses.activate
+    def test_add_to_collection(self):
+        user = User.objects.create_superuser(username='hroch', password='big_hippo', email='hippo@test.com', is_active=True)
+        user.save()
+        self.selenium.get(f"{self.live_server_url}/login")
+        username_input = self.selenium.find_element(By.NAME, "username")
+        username_input.send_keys("hroch")
+        password_input = self.selenium.find_element(By.NAME, "password")
+        password_input.send_keys("big_hippo")
+        self.selenium.find_element(By.XPATH, '//input[@value="Login"]').click()
+
+        rsp1 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/full-overview.json", 
+        json=FULL_OVERVIEW,
+        status=200)
+        responses.add(rsp1)
+
+        rsp2 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/current/combined-print-and-e-book-fiction.json", 
+        json= COMBINED_PRINT_AND_EBOOK_FICTION,
+        status=200)
+        responses.add(rsp2)
+        self.selenium.get(self.live_server_url)
+        more_info = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[2]/a')
+        more_info.click()
+        add_to_collection = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/form/label/span')
+        add_to_collection.click()
+        title= self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[2]/div/div[2]/div/h5[1]')
+        self.assertEqual(title.text, "TO DIE FOR")
+        # kontrola zda je to v databazi
+        book = MyBook.objects.get(book_title='TO DIE FOR')
+        self.assertEqual(book.book_title, "TO DIE FOR")
+        self.assertEqual(book.author, "David Baldacci")
+        self.assertEqual(book.book_description, "The third book in the 6:20 Man series. Devine digs into the deaths of an orphan’s parents and uncovers a large conspiracy.")
+        self.assertIsNone(book.rating)
+        self.assertEqual(book.created_by.username, "hroch")
+        self.assertEqual(book.image, "https://storage.googleapis.com/du-prd/books/images/9781538757901.jpg")
+        self.assertEqual(book.category, "Other")
+
+    @responses.activate
+    def test_status_400(self):
+        rsp1 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/full-overview.json", 
+        json={},
+        status=400)
+        responses.add(rsp1) 
+        self.selenium.get(self.live_server_url)
+        no_data = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/h3[1]')
+        self.assertEqual(no_data.text, "Could not load bestsellers list from New York Times!")
+    
+    @responses.activate
+    def test_status_400_more_info(self):
+        rsp1 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/full-overview.json", 
+        json=FULL_OVERVIEW,
+        status=200)
+        responses.add(rsp1)
+
+        rsp2 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/current/combined-print-and-e-book-fiction.json", 
+        json= {},
+        status=400)
+        responses.add(rsp2)
+        self.selenium.get(self.live_server_url)
+        more_info = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[2]/a')
+        more_info.click()
+        no_data = self.selenium.find_element(By.CLASS_NAME, 'title_no_data')
+        self.assertEqual(no_data.text, "Could not load list from New York Times!")
+    
+    @responses.activate
+    def test_status_400_more_info_again(self):
+        rsp1 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/full-overview.json", 
+        json=FULL_OVERVIEW,
+        status=200)
+        responses.add(rsp1)
+
+        rsp2= responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/current/combined-print-and-e-book-fiction.json", 
+        json= {},
+        status=400)
+        responses.add(rsp2)
+
+        rsp3 = responses.Response(
+        method="GET",
+        url="https://api.nytimes.com/svc/books/v3/lists/current/combined-print-and-e-book-fiction.json", 
+        json= COMBINED_PRINT_AND_EBOOK_FICTION,
+        status=200)
+        responses.add(rsp3)
+
+        self.selenium.get(self.live_server_url)
+        more_info = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div/div/div[1]/div[2]/a')
+        more_info.click()
+        no_data = self.selenium.find_element(By.CLASS_NAME, 'title_no_data')
+        self.assertEqual(no_data.text, "Could not load list from New York Times!")
+        again_here  = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/h3[2]/a')
+        again_here.click()
+        title = self.selenium.find_element(By.XPATH, '/html/body/div/div/main/div/div[1]/div[2]/h3')
+        self.assertEqual(title.text, "TO DIE FOR")
+
+        
+
+
+
+
+
+
+
+        
+
+
+    
 
 class RestApiTest(unittest.TestCase):
     

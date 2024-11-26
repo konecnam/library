@@ -21,15 +21,16 @@ import os
 
 
 class Book_card:
-    def __init__(self, category, author, book_image, description, title):
+    def __init__(self, category, author, book_image, description, title, category_encoded):
         self.category = category
         self.author = author
         self.book_image = book_image
         self.description = description
         self.title = title
+        self.category_encoded = category_encoded
 
 class Book_card_info:
-    def __init__(self, author, book_image, description, title, publisher, primary_isbn10, primary_isbn13, buy_links, category):
+    def __init__(self, author, book_image, description, title, publisher, primary_isbn10, primary_isbn13, buy_links, category, category_encoded):
         self.author = author
         self.book_image = book_image
         self.description = description
@@ -39,6 +40,7 @@ class Book_card_info:
         self.primary_isbn13 = primary_isbn13
         self.buy_links = buy_links
         self.category = category
+        self.category_encoded = category_encoded
 
 class Book_top5:
     def __init__(self, author, book_image, title):
@@ -53,13 +55,14 @@ def best_book(data):
         lists = results['lists']
         for slovnik in lists:
             category = slovnik['list_name']
+            category_encoded = slovnik['list_name_encoded']
             books = slovnik['books']
             book_1 = books[0]
             author = book_1['author']
             book_image = book_1['book_image']
             description = book_1['description']
             title = book_1['title']
-            card = Book_card(category, author, book_image, description, title) 
+            card = Book_card(category, author, book_image, description, title, category_encoded) 
             cards.append(card)
     return cards
 
@@ -68,6 +71,7 @@ def more_about_book(data, number):
     # if 'results' in data:
     results = data ['results']
     category= results['list_name']
+    category_encoded = results ['list_name_encoded']
     books = results['books']
     book_1 = books[int(number)-1]
     author = book_1['author']
@@ -78,7 +82,7 @@ def more_about_book(data, number):
     primary_isbn10=book_1['primary_isbn10']
     primary_isbn13 = book_1['primary_isbn13']
     buy_links = book_1['buy_links']
-    card = Book_card_info(author, book_image, description, title, publisher, primary_isbn10,primary_isbn13, buy_links, category)
+    card = Book_card_info(author, book_image, description, title, publisher, primary_isbn10,primary_isbn13, buy_links, category, category_encoded)
     return card 
 
 def top_5 (data):
@@ -97,8 +101,14 @@ def top_5 (data):
 
 def more_info_a_book(request,category, number):
     if request.method == "GET":
-        response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
-        data = response.json()
+        try:
+            response = requests.get(url= f'https://api.nytimes.com/svc/books/v3/lists/current/{category}.json', params = {'api-key':os.getenv("API_KEY")})
+            data = response.json()
+        except ConnectionError:
+            return render(request, "no_data_book.html", {
+                'category':category,
+                'number': number
+            })
         if 'results' in data:
             book  = more_about_book(data, number)
             tops5 = top_5(data)
@@ -169,8 +179,11 @@ def register(request):
         return render(request, "register.html")
 
 def best_sellers(request):
-    response = requests.get(url= 'https://api.nytimes.com/svc/books/v3/lists/full-overview.json', params = {'api-key':os.getenv("API_KEY")})
-    data = response.json()
+    try:
+        response = requests.get(url= 'https://api.nytimes.com/svc/books/v3/lists/full-overview.json', params = {'api-key':os.getenv("API_KEY")})
+        data = response.json()
+    except ConnectionError:
+        return render(request, "no_data.html")
     cards = best_book(data)
     if len(cards) > 0:
         return render (request, "best_sellers.html", {
@@ -235,7 +248,7 @@ def collection(request):
         author = request.POST["author"]
         book_description = request.POST ["book_description"]
         image = request.POST['image']
-        category = request.POST['category']
+        category = request.POST.get('category', 'Other')
 
         if not book_title or not author or not book_description or not image or not category:
             error_url = reverse("collection") + "?" + urlencode({"error": "Not all fields are filled in!"})
