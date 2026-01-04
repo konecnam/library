@@ -26,6 +26,7 @@ class Book_test(TestCase):
                 "lists": [
                 {
                     "list_name": "Romantic",
+                    "list_name_encoded": "Romantic",
                     "books": [
                     {
                         "author": "Mona Kasten",
@@ -51,6 +52,7 @@ class Book_test(TestCase):
         data = {
              "results": {
                   "list_name": "Romantic",
+                  "list_name_encoded": "Romantic",
                   "books":[
                        {
                             "author":"Mona Kasten",
