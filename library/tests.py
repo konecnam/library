@@ -486,7 +486,7 @@ class MyBestSellers(StaticLiveServerTestCase):
     def tearDownClass(cls):
         cls.selenium.quit()
         super().tearDownClass()
-
+    # mock
     @responses.activate
     def test_best_seller(self):
         rsp1 = responses.Response(
@@ -670,7 +670,7 @@ class RestApiTest(unittest.TestCase):
         self.client = Client()
 
     def tearDown(self):
-        # Vymažeme všechny záznamy z tabulek v databázi
+        # Vymažeme všechny záznamy z tabulek v databázi po každém testě
         MyBook.objects.all().delete()
         User.objects.all().delete()
 
