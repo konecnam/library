@@ -486,7 +486,7 @@ class MyBestSellers(StaticLiveServerTestCase):
     def tearDownClass(cls):
         cls.selenium.quit()
         super().tearDownClass()
-    # mock
+    # selenium test with mock!
     @responses.activate
     def test_best_seller(self):
         rsp1 = responses.Response(
@@ -654,15 +654,6 @@ class MyBestSellers(StaticLiveServerTestCase):
         
 
 
-
-
-
-
-
-        
-
-
-    
 
 class RestApiTest(unittest.TestCase):
     
